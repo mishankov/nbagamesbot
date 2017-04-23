@@ -65,11 +65,11 @@ while True:
                                        message['text']))
 
             if '/scores' in message['text']:
-                bot.send_message(message['chat']['id'], scores)
+                bot.send_message(message['chat']['id'], scores, parse_mode='HTML')
                 print('Scores sent to {}'.format(message['from']['username']))
 
             if '/schedule' in message['text']:
-                bot.send_message(message['chat']['id'], schedule)
+                bot.send_message(message['chat']['id'], schedule,  parse_mode='HTML')
                 print('Schedule sent to {}'.format(message['from']['username']))
             print('------\n')
 
