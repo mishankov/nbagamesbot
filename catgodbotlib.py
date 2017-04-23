@@ -4,16 +4,6 @@ from constants import *
 
 
 class Bot:
-    class User:
-        def __init__(self, id, first_name):
-            self.id = id
-            self.first_name = first_name
-
-        @classmethod
-        def from_json(self, json):
-            self.id = json['id']
-            self.first_name = json['first_name']
-
     def __init__(self, token):
         self.token = token
 
