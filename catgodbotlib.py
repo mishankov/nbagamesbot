@@ -4,8 +4,19 @@ from constants import *
 
 
 class Bot:
-    def __init__(self, token):
+    def __init__(self, token, default_parse_mode=''):
         self.token = token
+
+        self.default_parse_mode = default_parse_mode
+
+    def set_default_parse_mode(self, name):
+        """
+        Set default value for parse_mode param in send_message() method
+
+        :param str name: should be 'HTML', 'Markdown' or ''
+        :return: nothing
+        """
+        self.default_parse_mode = name
 
     def get_me(self):
         return requests.post(URL + self.token + '/getMe')
@@ -27,7 +38,7 @@ class Bot:
                              '&allowed_updates=' + allowed_updates_str)
 
     def send_message(self, chat_id, text, **kwargs):
-        parse_mode = kwargs.get('parse_mode', '')
+        parse_mode = kwargs.get('parse_mode', self.default_parse_mode)
         disable_web_page_preview = kwargs.get('disable_web_page_preview', 'False')
         disable_notification = kwargs.get('disable_notification', 'False')
         reply_to_message_id = kwargs.get('reply_to_message_id', '')

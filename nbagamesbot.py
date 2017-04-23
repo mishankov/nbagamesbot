@@ -40,7 +40,7 @@ print('---\nInfo updated\n---')
 
 TOKEN = '341653921:AAEd3_iWZSby16uHaT1we17E0lIw4Pv9IXg'
 
-bot = catgodbotlib.Bot(TOKEN)
+bot = catgodbotlib.Bot(TOKEN, default_parse_mode='HTML')
 
 request = bot.get_me()
 result = request.json()['result']
@@ -65,11 +65,11 @@ while True:
                                        message['text']))
 
             if '/scores' in message['text']:
-                bot.send_message(message['chat']['id'], scores, parse_mode='HTML')
+                bot.send_message(message['chat']['id'], scores)
                 print('Scores sent to {}'.format(message['from']['username']))
 
             if '/schedule' in message['text']:
-                bot.send_message(message['chat']['id'], schedule,  parse_mode='HTML')
+                bot.send_message(message['chat']['id'], schedule)
                 print('Schedule sent to {}'.format(message['from']['username']))
             print('------\n')
 
