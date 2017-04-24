@@ -20,7 +20,7 @@ def get_schedule():
     data = pd.read_html(link)
 
     schedule = ''
-    for i in range(0, len(data[0]), 2):
+    for i in range(0, len(data[1]), 2):
         schedule += '{} @ {}\n'.format(data[1].loc[i][0].split()[0], data[1].loc[i][1].split()[0])
 
     return schedule
