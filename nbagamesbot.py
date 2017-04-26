@@ -35,7 +35,7 @@ def get_schedule():
 
     schedule = ''
     for i in range(0, len(data[1]), 2):
-        schedule += '{} @ {}\n'.format(data[1].loc[i][0].split()[0], data[1].loc[i][1].split()[0])
+        schedule += '{} @ {}\n'.format(data[0].loc[i][0].split()[-1], data[0].loc[i][1].split()[-1])
 
     return schedule
 
