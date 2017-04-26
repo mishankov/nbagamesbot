@@ -1,22 +1,36 @@
 import catgodbotlib
 import threading
 import time
+from datetime import date
+import datetime
 import pandas as pd
+import bs4 as bs
+import requests
 
 
 def get_scores():
-    link = 'http://www.espn.com/nba/schedule/_/date/20170422'
-    data = pd.read_html(link)
+    day = (date.today() - datetime.timedelta(1)).strftime("%Y%m%d")
+    link = 'http://www.espn.com/nba/schedule/_/date/' + day
 
-    scores = ''
-    for i in range(0, len(data[0]), 2):
-        scores += '{}\n'.format(data[0].loc[i]['result'])
+    sauce = requests.get(link).text
+    soup = bs.BeautifulSoup(sauce, 'lxml')
+    game_links = soup.find_all('a', {'name': '&lpos=nba:schedule:score'})
 
-    return scores
+    overall = ''
+    game_number = 1
+    for game_link in game_links:
+        url = 'http://www.espn.com' + str(game_link['href']).replace('game', 'boxscore', 1)
+        dfs = pd.read_html(url)
+        overall += '/game{} {} {}:{} {}\n'.format(game_number,
+                                                  dfs[0].loc[0][0], dfs[0].loc[0]['T'],
+                                                  dfs[0].loc[1]['T'], dfs[0].loc[1][0])
+        game_number += 1
+
+    return overall
 
 
 def get_schedule():
-    link = 'http://www.espn.com/nba/schedule/_/date/20170422'
+    link = 'http://www.espn.com/nba/schedule'
     data = pd.read_html(link)
 
     schedule = ''
