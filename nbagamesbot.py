@@ -7,10 +7,17 @@ import pandas as pd
 import bs4 as bs
 import requests
 
+TOKEN = ''
+CHAT_FOR_LOGS = 0
 
-def get_scores():
-    day = (date.today() - datetime.timedelta(1)).strftime("%Y%m%d")
+bot = catgodbotlib.Bot(TOKEN, default_parse_mode='HTML')
+
+
+def get_scores(delta=1):
+    log_it('begin get_scores')
+    day = (date.today() - datetime.timedelta(delta)).strftime("%Y%m%d")
     link = 'http://www.espn.com/nba/schedule/_/date/' + day
+    print(link)
 
     sauce = requests.get(link).text
     soup = bs.BeautifulSoup(sauce, 'lxml')
@@ -26,42 +33,55 @@ def get_scores():
                                                   dfs[0].loc[1]['T'], dfs[0].loc[1][0])
         game_number += 1
 
-    return overall
+    log_it('end get_scores')
+    if overall == '':
+        return get_scores(delta+1)
+    else:
+        return overall
 
 
 def get_schedule():
-    link = 'http://www.espn.com/nba/schedule'
+    log_it('begin get_schedule')
+    day = date.today().strftime("%Y%m%d")
+    link = 'http://www.espn.com/nba/schedule/_/date/' + day
+    print(link)
     data = pd.read_html(link)
+    print(data)
 
     schedule = ''
-    for i in range(0, len(data[1]), 2):
+    for i in range(0, len(data[0]), 2):
         schedule += '{} @ {}\n'.format(data[0].loc[i][0].split()[-1], data[0].loc[i][1].split()[-1])
 
+    log_it('end get_schedule')
     return schedule
 
 
 def update_info():
-    global scores, schedule
+    log_it('begin update_info')
+    global scores, schedule, bot
     while True:
         scores = get_scores()
         schedule = get_schedule()
-        print('---\nInfo updated\n---')
-        time.sleep(300)
+        log_it('end update_info')
+        time.sleep(3600)
 
-scores = get_scores()
-schedule = get_schedule()
-print('---\nInfo updated\n---')
 
-TOKEN = '341653921:AAEd3_iWZSby16uHaT1we17E0lIw4Pv9IXg'
+def log_it(message):
+    print(message)
+    bot.send_message(CHAT_FOR_LOGS, message)
 
-bot = catgodbotlib.Bot(TOKEN, default_parse_mode='HTML')
 
 request = bot.get_me()
 result = request.json()['result']
-print('Username: @{}\nName: {}\nid: {}'.format(result['username'], result['first_name'], result['id']))
+log_it('Username: @{}\nName: {}\nid: {}'.format(result['username'], result['first_name'], result['id']))
+
 
 last_handled_update = bot.get_updates().json()['result'][-1]['update_id']
-print('Last handled update: {}'.format(last_handled_update))
+log_it('Last handled update: {}'.format(last_handled_update))
+
+
+scores = get_scores()
+schedule = get_schedule()
 
 print('------\n')
 
@@ -74,17 +94,24 @@ while True:
     for update in result:
         if update['update_id'] > last_handled_update:
             message = update['message']
-            print('@{}@{} "{}"'.format(message['from']['username'],
+            log = '{}@{}: "{}"'.format(message['from']['username'],
                                        message['chat']['username' if message['chat']['type'] == 'private' else 'title'],
-                                       message['text']))
+                                       message['text'])
+            log_it(log)
 
             if '/scores' in message['text']:
                 bot.send_message(message['chat']['id'], scores)
-                print('Scores sent to {}'.format(message['from']['username']))
+
+                log = 'Scores sent to {}'.format(message['chat']
+                                                 ['username' if message['chat']['type'] == 'private' else 'title'])
+                log_it(log)
 
             if '/schedule' in message['text']:
                 bot.send_message(message['chat']['id'], schedule)
-                print('Schedule sent to {}'.format(message['from']['username']))
+
+                log = 'Schedule sent to {}'.format(message['chat']
+                                                 ['username' if message['chat']['type'] == 'private' else 'title'])
+                log_it(log)
             print('------\n')
 
             last_handled_update = update['update_id']
