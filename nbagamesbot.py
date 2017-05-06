@@ -90,26 +90,28 @@ while True:
 
     for update in result:
         if update.update_id > last_handled_update:
-            message = update.message
-            log = '{}@{}({}): "{}"'.format(message.sender.username,
-                                           message.chat.username if message.chat.type == 'private' else message.chat.title,
-                                           message.chat.id,
-                                           message.text)
-            log_it(log)
+            if 'message' in update.__dict__:
+                if 'text' in update.message.__dict__:
+                    message = update.message
+                    log = '{}@{}({}): "{}"'.format(message.sender.username,
+                                                   message.chat.username if message.chat.type == 'private' else message.chat.title,
+                                                   message.chat.id,
+                                                   message.text)
+                    log_it(log)
 
-            if '/scores' in message.text:
-                bot.send_message(message.chat.id, scores)
+                    if '/scores' in message.text:
+                        bot.send_message(message.chat.id, scores)
 
-                log = 'Scores sent to {}'.format(
-                    message.chat.username if message.chat.type == 'private' else message.chat.title)
-                log_it(log)
+                        log = 'Scores sent to {}'.format(
+                            message.chat.username if message.chat.type == 'private' else message.chat.title)
+                        log_it(log)
 
-            if '/schedule' in message.text:
-                bot.send_message(message.chat.id, schedule)
+                    if '/schedule' in message.text:
+                        bot.send_message(message.chat.id, schedule)
 
-                log = 'schedule sent to {}'.format(
-                    message.chat.username if message.chat.type == 'private' else message.chat.title)
-                log_it(log)
-            print('------\n')
+                        log = 'schedule sent to {}'.format(
+                            message.chat.username if message.chat.type == 'private' else message.chat.title)
+                        log_it(log)
+                    print('------\n')
 
-            last_handled_update = update.update_id
+                    last_handled_update = update.update_id
