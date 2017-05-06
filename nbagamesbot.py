@@ -35,7 +35,7 @@ def get_scores(delta=1):
 
     log_it('end get_scores')
     if overall == '':
-        return get_scores(delta+1)
+        return get_scores(delta + 1)
     else:
         return overall
 
@@ -46,7 +46,6 @@ def get_schedule():
     link = 'http://www.espn.com/nba/schedule/_/date/' + day
     print(link)
     data = pd.read_html(link)
-    print(data)
 
     schedule = ''
     for i in range(0, len(data[0]), 2):
@@ -72,16 +71,14 @@ def log_it(message):
 
 
 request = bot.get_me()
-result = request.json()['result']
+result = request['result']
 log_it('Username: @{}\nName: {}\nid: {}'.format(result['username'], result['first_name'], result['id']))
 
-
-last_handled_update = bot.get_updates().json()['result'][-1]['update_id']
+last_handled_update = bot.get_updates()[-1].update_id
 log_it('Last handled update: {}'.format(last_handled_update))
 
-
-scores = get_scores()
-schedule = get_schedule()
+scores = ''
+schedule = ''
 
 print('------\n')
 
@@ -89,29 +86,30 @@ threading.Thread(target=update_info, args=()).start()
 
 while True:
     request = bot.get_updates()
-    result = request.json()['result']
+    result = None if len(request) == 0 else request
 
     for update in result:
-        if update['update_id'] > last_handled_update:
-            message = update['message']
-            log = '{}@{}: "{}"'.format(message['from']['username'],
-                                       message['chat']['username' if message['chat']['type'] == 'private' else 'title'],
-                                       message['text'])
+        if update.update_id > last_handled_update:
+            message = update.message
+            log = '{}@{}({}): "{}"'.format(message.sender.username,
+                                           message.chat.username if message.chat.type == 'private' else message.chat.title,
+                                           message.chat.id,
+                                           message.text)
             log_it(log)
 
-            if '/scores' in message['text']:
-                bot.send_message(message['chat']['id'], scores)
+            if '/scores' in message.text:
+                bot.send_message(message.chat.id, scores)
 
-                log = 'Scores sent to {}'.format(message['chat']
-                                                 ['username' if message['chat']['type'] == 'private' else 'title'])
+                log = 'Scores sent to {}'.format(
+                    message.chat.username if message.chat.type == 'private' else message.chat.title)
                 log_it(log)
 
-            if '/schedule' in message['text']:
-                bot.send_message(message['chat']['id'], schedule)
+            if '/schedule' in message.text:
+                bot.send_message(message.chat.id, schedule)
 
-                log = 'Schedule sent to {}'.format(message['chat']
-                                                 ['username' if message['chat']['type'] == 'private' else 'title'])
+                log = 'schedule sent to {}'.format(
+                    message.chat.username if message.chat.type == 'private' else message.chat.title)
                 log_it(log)
             print('------\n')
 
-            last_handled_update = update['update_id']
+            last_handled_update = update.update_id
