@@ -45,6 +45,13 @@ def get_schedule():
     day = date.today().strftime("%Y%m%d")
     link = 'http://www.espn.com/nba/schedule/_/date/' + day
     print(link)
+
+    sauce = requests.get(link).text
+    soup = bs.BeautifulSoup(sauce, 'lxml')
+    tds = soup.find_all('td')
+    if tds[0].text == 'No games scheduled':
+        return 'No games scheduled for today'
+
     data = pd.read_html(link)
 
     schedule = ''
