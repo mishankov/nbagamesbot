@@ -91,3 +91,4 @@ ENV/
 #Manual
 helper.py
 .idea
+catgodbotlib/
