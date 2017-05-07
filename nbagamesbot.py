@@ -7,8 +7,8 @@ import pandas as pd
 import bs4 as bs
 import requests
 
-TOKEN = '341653921:AAEzlrImWQFJeyz-XSDGmzWug3o_FghtbXM'
-CHAT_FOR_LOGS = -1001103158788
+TOKEN = ''
+CHAT_FOR_LOGS = 0
 
 bot = Bot(TOKEN, default_parse_mode='HTML')
 
