@@ -1,4 +1,4 @@
-import catgodbotlib
+from catgodbotlib.catgodbotlib import Bot
 import threading
 import time
 from datetime import date
@@ -7,10 +7,10 @@ import pandas as pd
 import bs4 as bs
 import requests
 
-TOKEN = ''
-CHAT_FOR_LOGS = 0
+TOKEN = '341653921:AAEzlrImWQFJeyz-XSDGmzWug3o_FghtbXM'
+CHAT_FOR_LOGS = -1001103158788
 
-bot = catgodbotlib.Bot(TOKEN, default_parse_mode='HTML')
+bot = Bot(TOKEN, default_parse_mode='HTML')
 
 
 def get_scores(delta=1):
@@ -97,6 +97,7 @@ while True:
 
     for update in result:
         if update.update_id > last_handled_update:
+            log_it(update.__dict__)
             if 'message' in update.__dict__:
                 if 'text' in update.message.__dict__:
                     message = update.message
